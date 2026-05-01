@@ -1,0 +1,160 @@
+# Конфигурация модели и обучения
+model:
+  name: "Qwen/Qwen2.5-1.5B"
+  revision: "main"
+  trust_remote_code: true
+  cache_dir: "./models/cache"
+  
+  # Параметры quantization для QLoRA
+  quantization:
+    load_in_4bit: true
+    bnb_4bit_compute_dtype: "float16"
+    bnb_4bit_quant_type: "nf4"
+    bnb_4bit_use_double_quant: true
+  
+  # Параметры LoRA
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.1
+    target_modules:
+      - "q_proj"
+      - "k_proj"
+      - "v_proj"
+      - "o_proj"
+      - "gate_proj"
+      - "up_proj"
+      - "down_proj"
+  
+  # Параметры генерации
+  generation:
+    max_length: 512
+    min_length: 20
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 50
+    repetition_penalty: 1.1
+    do_sample: true
+    num_beams: 1
+    length_penalty: 1.0
+  
+  # Языковые промпты
+  prompts:
+    kk:
+      system: |
+        Сіз пайдалы, қауіпсіз және дәл ақпарат беретін қазақ тіліндегі көмекшісіз.
+        Сіздің жауаптарыңыз мәтінмәнді, толық және деректерге негізделген болуы керек.
+        Егер сұраққа жауап бере алмасаңыз, мұны ашық айтыңыз.
+      
+      instruction: |
+        Төменде қазақ тіліндегі сұрақ берілген. Оған контекстке сүйене отырып жауап беріңіз.
+        
+        Контекст:
+        {context}
+        
+        Сұрақ: {question}
+        
+        Жауап:
+    
+    ru:
+      system: |
+        Вы полезный, безопасный и точный помощник на русском языке.
+        Ваши ответы должны быть информативными, полными и основанными на фактах.
+        Если вы не можете ответить на вопрос, честно скажите об этом.
+      
+      instruction: |
+        Ниже приведен вопрос на русском языке. Ответьте на него, используя предоставленный контекст.
+        
+        Контекст:
+        {context}
+        
+        Вопрос: {question}
+        
+        Ответ:
+    
+    en:
+      system: |
+        You are a helpful, safe and accurate English language assistant.
+        Your responses should be informative, complete and fact-based.
+        If you cannot answer a question, honestly say so.
+      
+      instruction: |
+        Below is a question in English. Answer it using the provided context.
+        
+        Context:
+        {context}
+        
+        Question: {question}
+        
+        Answer:
+
+training:
+  # Параметры датасета
+  dataset:
+    max_length: 512
+    train_split: 0.8
+    val_split: 0.1
+    test_split: 0.1
+    preprocessing_num_workers: 4
+    overwrite_cache: false
+  
+  # Параметры оптимизатора
+  optimizer:
+    learning_rate: 2e-4
+    weight_decay: 0.01
+    adam_beta1: 0.9
+    adam_beta2: 0.999
+    adam_epsilon: 1e-8
+  
+  # Параметры scheduler
+  scheduler:
+    warmup_steps: 100
+    lr_scheduler_type: "cosine"
+    num_cycles: 0.5
+  
+  # Параметры тренировки
+  training:
+    num_train_epochs: 3
+    per_device_train_batch_size: 4
+    per_device_eval_batch_size: 4
+    gradient_accumulation_steps: 4
+    max_grad_norm: 1.0
+    gradient_checkpointing: true
+    gradient_checkpointing_kwargs:
+      use_reentrant: false
+  
+  # Сохранение и логирование
+  logging:
+    logging_steps: 10
+    eval_steps: 500
+    save_steps: 500
+    save_total_limit: 3
+    save_only_model: false
+    report_to: "wandb"
+  
+  # Ранняя остановка
+  early_stopping:
+    patience: 3
+    threshold: 0.001
+  
+  # Смешанная точность
+  fp16: false
+  bf16: true
+
+evaluation:
+  metrics:
+    - "bleu"
+    - "rouge"
+    - "meteor"
+    - "perplexity"
+    - "accuracy"
+  
+  compute_per_language: true
+  max_eval_samples: 1000
+
+inference:
+  device_map: "auto"
+  torch_dtype: "float16"
+  low_cpu_mem_usage: true
+  use_safetensors: true
+  trust_remote_code: true

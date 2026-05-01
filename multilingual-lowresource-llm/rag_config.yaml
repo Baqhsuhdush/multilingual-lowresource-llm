@@ -1,0 +1,184 @@
+# Конфигурация RAG системы
+retrieval:
+  # Модели эмбеддингов
+  embedding_models:
+    dense:
+      name: "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+      cache_dir: "./models/embeddings"
+      device: "cuda"
+      normalize_embeddings: true
+    
+    sparse:
+      name: "bm25"
+      k1: 1.5
+      b: 0.75
+      epsilon: 0.25
+    
+    reranker:
+      name: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+      enabled: true
+      top_k: 10
+  
+  # Стратегия поиска
+  strategy: "hybrid"
+  dense_weight: 0.7
+  sparse_weight: 0.3
+  fusion_method: "weighted"
+  
+  # Параметры поиска
+  search:
+    top_k: 5
+    score_threshold: 0.5
+    max_tokens_per_document: 1000
+    include_metadata: true
+    
+  # Мультиязычный поиск
+  multilingual:
+    enabled: true
+    query_translation: true
+    document_translation: false
+    supported_languages: ["kk", "ru", "en"]
+    default_language: "kk"
+
+indexing:
+  # Параметры чанкинга
+  chunking:
+    strategy: "recursive"
+    chunk_size: 512
+    chunk_overlap: 50
+    separators:
+      - "\n\n"
+      - "\n"
+      - ". "
+      - "? "
+      - "! "
+      - " "
+    keep_separator: true
+    
+  # Предобработка документов
+  preprocessing:
+    clean_html: true
+    remove_urls: true
+    remove_emails: true
+    remove_phone_numbers: true
+    normalize_whitespace: true
+    lowercase: false
+    language_detection: true
+    min_document_length: 50
+    max_document_length: 10000
+    
+  # FAISS параметры
+  faiss:
+    index_type: "IndexFlatIP"
+    metric_type: "inner_product"
+    nprobe: 10
+    use_gpu: true
+    gpu_id: 0
+    train_size: 10000
+    
+  # Параметры обновления
+  update:
+    incremental: true
+    batch_size: 100
+    parallel_workers: 4
+    rebuild_threshold: 1000
+
+storage:
+  # Локальное хранение
+  local:
+    index_dir: "./data/faiss_indexes"
+    document_dir: "./data/processed/documents"
+    embedding_dir: "./data/embeddings"
+    
+  # Внешнее хранение
+  external:
+    qdrant:
+      enabled: false
+      url: "http://localhost:6333"
+      collection_name: "multilingual_documents"
+      vector_size: 768
+      
+    weaviate:
+      enabled: false
+      url: "http://localhost:8080"
+      class_name: "Document"
+
+caching:
+  enabled: true
+  backend: "redis"
+  ttl: 3600
+  max_size: 10000
+  
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    password: null
+
+query_processing:
+  # Расширение запроса
+  query_expansion:
+    enabled: true
+    method: "synonym"
+    max_expansions: 3
+    
+  # Исправление опечаток
+  spell_check:
+    enabled: true
+    language: "auto"
+    max_distance: 2
+    
+  # Нормализация
+  normalization:
+    enabled: true
+    lowercase: false
+    remove_punctuation: false
+    stem: false
+    lemmatize: false
+    
+  # Извлечение ключевых слов
+  keyword_extraction:
+    enabled: true
+    method: "yake"
+    num_keywords: 5
+
+reranking:
+  enabled: true
+  model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+  top_k: 10
+  batch_size: 32
+  device: "cuda"
+
+monitoring:
+  # Метрики
+  metrics:
+    - "recall@k"
+    - "precision@k"
+    - "mrr"
+    - "ndcg"
+    - "latency"
+    
+  # Логирование
+  logging:
+    level: "INFO"
+    format: "json"
+    file: "./logs/rag.log"
+    
+  # Prometheus
+  prometheus:
+    enabled: true
+    port: 9091
+
+performance:
+  # Параллелизм
+  parallel_processing: true
+  num_workers: 4
+  batch_size: 32
+  
+  # Оптимизация памяти
+  memory_efficient: true
+  max_memory_usage: 0.8
+  
+  # Кэширование
+  cache_embeddings: true
+  cache_queries: true

@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# ============================================
+# МНОГОЯЗЫЧНАЯ LLM - СКРИПТ НАСТРОЙКИ
+# ============================================
+
+set -e  # Выход при ошибке
+
+echo "🚀 Начало настройки проекта..."
+
+# Проверка Python
+if ! command -v python3 &> /dev/null; then
+    echo "❌ Python3 не найден. Установите Python 3.9+"
+    exit 1
+fi
+
+PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+echo "✅ Python $PYTHON_VERSION найден"
+
+# Проверка версии Python
+if [[ $(echo "$PYTHON_VERSION < 3.9" | bc) -eq 1 ]]; then
+    echo "❌ Требуется Python 3.9+"
+    exit 1
+fi
+
+# Создание виртуального окружения
+if [ ! -d "venv" ]; then
+    echo "🔧 Создание виртуального окружения..."
+    python3 -m venv venv
+fi
+
+# Активация виртуального окружения
+echo "🔧 Активация виртуального окружения..."
+source venv/bin/activate
+
+# Обновление pip
+echo "📦 Обновление pip..."
+pip install --upgrade pip
+
+# Установка зависимостей
+echo "📦 Установка зависимостей..."
+pip install -e ".[dev]"
+
+# Создание директорий
+echo "📁 Создание структуры проекта..."
+mkdir -p data/{raw/{kk,ru},processed,embeddings,faiss_indexes}
+mkdir -p models/{pretrained,finetuned,adapters}
+mkdir -p logs mlruns experiments/{notebooks,scripts}
+
+# Копирование конфигурации
+if [ ! -f ".env" ]; then
+    echo "📄 Создание .env файла..."
+    cp .env.example .env
+    echo "⚠️  Отредактируйте .env файл перед использованием"
+fi
+
+# Установка pre-commit хуков
+echo "🔧 Установка pre-commit хуков..."
+pre-commit install
+
+# Скачивание примеров данных
+echo "📊 Скачивание примеров данных..."
+if [ -f "scripts/download_sample_data.py" ]; then
+    python scripts/download_sample_data.py
+fi
+
+echo "✅ Настройка завершена!"
+echo ""
+echo "Следующие шаги:"
+echo "1. Отредактируйте .env файл"
+echo "2. Запустите: python run.py train"
+echo "3. Запустите: python run.py serve"
+echo "4. Запустите: python run.py demo"
+echo ""
+echo "Удачи в разработке! 🚀"

@@ -1,0 +1,161 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "multilingual-lowresource-llm"
+version = "0.1.0"
+description = "Efficient multilingual LLM for Kazakh and Russian languages"
+readme = "README.md"
+authors = [{name = "Your Name", email = "your.email@example.com"}]
+license = {text = "MIT"}
+requires-python = ">=3.9"
+keywords = ["llm", "multilingual", "low-resource", "kazakh", "russian", "rag", "qlora"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Linguistic",
+]
+
+dependencies = [
+    "torch>=2.0.0",
+    "transformers>=4.35.0",
+    "datasets>=2.14.0",
+    "accelerate>=0.24.0",
+    "peft>=0.7.0",
+    "sentence-transformers>=2.2.0",
+    "faiss-cpu>=1.7.4",
+    "fastapi>=0.104.0",
+    "streamlit>=1.28.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+    "pre-commit>=3.0",
+    "jupyter>=1.0",
+    "ipywidgets>=8.0",
+]
+gpu = [
+    "torch>=2.0.0",
+    "faiss-gpu>=1.7.4",
+    "flash-attn>=2.0.0",
+    "xformers>=0.0.22",
+]
+full = [
+    "multilingual-lowresource-llm[dev]",
+    "multilingual-lowresource-llm[gpu]",
+    "mlflow>=2.8.0",
+    "wandb>=0.16.0",
+    "gradio>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/multilingual-lowresource-llm"
+Documentation = "https://github.com/yourusername/multilingual-lowresource-llm#readme"
+Repository = "https://github.com/yourusername/multilingual-lowresource-llm"
+"Bug Tracker" = "https://github.com/yourusername/multilingual-lowresource-llm/issues"
+
+[project.scripts]
+multilingual-llm = "src.cli:main"
+
+[tool.setuptools]
+packages = ["src"]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+"*" = ["*.py", "*.yaml", "*.json"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["src"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+strict_optional = true
+
+[[tool.mypy.overrides]]
+module = [
+    "transformers.*",
+    "torch.*",
+    "numpy.*",
+    "pandas.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--tb=short",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "gpu: marks tests that require GPU",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[metadata]
+version = "0.1.0"

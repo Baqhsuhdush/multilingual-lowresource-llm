@@ -1,0 +1,235 @@
+# ============================================
+# МНОГОЯЗЫЧНАЯ LLM - .gitignore
+# ============================================
+
+# Python
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+# ============================================
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+
+# IDE
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.sublime-*
+*.tmproj
+*.tmproject
+*.komodoproject
+
+# Data and Models
+# ============================================
+data/embeddings/*
+data/faiss_indexes/*
+!data/embeddings/.gitkeep
+!data/faiss_indexes/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+models/*
+!models/.gitkeep
+!models/pretrained/
+models/pretrained/*.bin
+models/pretrained/*.safetensors
+models/pretrained/*.json
+models/pretrained/*.txt
+
+# Логи
+# ============================================
+logs/
+*.log
+*.log.*
+log/
+*.pid
+*.seed
+
+# Кэши
+# ============================================
+.cache/
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+.ipynb_checkpoints
+
+# MLflow
+# ============================================
+mlruns/
+mlartifacts/
+
+# Weights & Biases
+# ============================================
+wandb/
+
+# Docker
+# ============================================
+docker-compose.override.yml
+*.dockerfile
+
+# Окружение
+# ============================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.staging.local
+
+# Тестовые данные
+# ============================================
+test_outputs/
+*.test
+*.bench
+
+# Документация
+# ============================================
+docs/_build/
+docs/source/generated/
+
+# Операционная система
+# ============================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Временные файлы
+# ============================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Jupyter
+# ============================================
+.ipynb_checkpoints
+*.ipynb
+!experiments/notebooks/*.ipynb
+
+# PyTorch
+# ============================================
+*.pt
+*.pth
+*.bin
+
+# Hugging Face
+# ============================================
+.huggingface/
+
+# Streamlit
+# ============================================
+.streamlit/
+
+# Coverage
+# ============================================
+.coverage
+.coverage.*
+htmlcov/
+
+# Profiling
+# ============================================
+prof/
+*.prof
+
+# Другое
+# ============================================
+*.sqlite3
+*.db
+*.sql
+*.h5
+*.hdf5
+*.pickle
+*.pkl
+*.joblib
+
+# ============================================
+# Дополнительные правила из стандартного .gitignore
+# ============================================
+
+# PyInstaller
+*.manifest
+*.spec
+
+# pipenv, poetry, pdm
+Pipfile.lock
+poetry.lock
+poetry.toml
+pdm.lock
+pdm.toml
+.pdm-python
+.pdm-build/
+
+# pixi
+pixi.lock
+.pixi
+
+# PEP 582 packages
+__pypackages__/
+
+# Cython debug symbols
+cython_debug/
+
+# pytype static type analyzer
+.pytype/
+
+# Pyre type checker
+.pyre/
+
+# Ruff
+.ruff_cache/
+
+# PyPI config
+.pypirc
+
+# Cursor AI
+.cursorignore
+.cursorindexingignore
+
+# Marimo
+marimo/_static/
+marimo/_lsp/
+__marimo__/
+
+# Abstra AI framework
+.abstra/

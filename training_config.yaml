@@ -1,0 +1,155 @@
+# Конфигурация тренировки
+defaults:
+  - model_config
+  - _self_
+
+experiment:
+  name: "multilingual-llm-experiment"
+  project: "multilingual-lowresource-llm"
+  group: "qlora-finetuning"
+  tags:
+    - "kazakh"
+    - "russian"
+    - "low-resource"
+    - "qlora"
+
+data:
+  # Источники данных
+  sources:
+    kazakh:
+      - name: "oscar"
+        dataset: "oscar-corpus/OSCAR-2301"
+        language: "kk"
+        split: "train"
+        max_samples: 10000
+      
+      - name: "kazakh_wiki"
+        dataset: "wikipedia"
+        language: "kk"
+        date: "20240101"
+        max_samples: 5000
+      
+      - name: "cc100"
+        dataset: "facebook/cc_100"
+        language: "kk"
+        split: "train"
+        max_samples: 10000
+    
+    russian:
+      - name: "oscar"
+        dataset: "oscar-corpus/OSCAR-2301"
+        language: "ru"
+        split: "train"
+        max_samples: 20000
+      
+      - name: "russian_wiki"
+        dataset: "wikipedia"
+        language: "ru"
+        date: "20240101"
+        max_samples: 10000
+  
+  # Предобработка
+  preprocessing:
+    min_length: 50
+    max_length: 2000
+    remove_duplicates: true
+    deduplication_method: "exact"
+    language_filter: true
+    special_char_threshold: 0.3
+  
+  # Токенизация
+  tokenization:
+    padding: "max_length"
+    truncation: true
+    max_length: 512
+
+training_args:
+  output_dir: "./models/finetuned"
+  overwrite_output_dir: true
+  do_train: true
+  do_eval: true
+  do_predict: false
+  evaluation_strategy: "steps"
+  prediction_loss_only: false
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 4
+  eval_accumulation_steps: 1
+  learning_rate: 2e-4
+  weight_decay: 0.01
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_epsilon: 1e-8
+  max_grad_norm: 1.0
+  num_train_epochs: 3
+  max_steps: -1
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.03
+  warmup_steps: 100
+  log_level: "info"
+  logging_strategy: "steps"
+  logging_steps: 10
+  logging_first_step: false
+  save_strategy: "steps"
+  save_steps: 500
+  save_total_limit: 3
+  seed: 42
+  data_seed: 42
+  dataloader_drop_last: false
+  eval_steps: 500
+  dataloader_num_workers: 4
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
+  ignore_data_skip: false
+  label_smoothing_factor: 0.0
+  group_by_length: true
+  length_column_name: "length"
+  report_to: "wandb"
+  ddp_find_unused_parameters: false
+  torch_compile: false
+  optim: "paged_adamw_8bit"
+  fp16: false
+  bf16: true
+
+qlora:
+  enabled: true
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.1
+  bias: "none"
+  task_type: "CAUSAL_LM"
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+  modules_to_save: null
+  layers_to_transform: null
+  layers_pattern: null
+  loftq_config: null
+
+wandb:
+  enabled: true
+  project: "multilingual-llm"
+  entity: null
+  tags:
+    - "experiment"
+    - "kazakh"
+    - "russian"
+  watch: "gradients"
+  log_model: "checkpoint"
+
+checkpoints:
+  save_safetensors: true
+  save_optimizer: false
+  save_scheduler: false
+  save_rng: false
+  safe_serialization: true
+
+deepspeed:
+  enabled: false
+  config_file: null

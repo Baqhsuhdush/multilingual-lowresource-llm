@@ -1,0 +1,79 @@
+@echo off
+chcp 65001 > nul
+
+echo 🚀 Начало настройки проекта...
+
+REM Проверка Python
+where python >nul 2>nul
+if errorlevel 1 (
+    echo ❌ Python не найден. Установите Python 3.9+
+    exit /b 1
+)
+
+python --version
+if errorlevel 1 (
+    echo ❌ Не удалось проверить версию Python
+    exit /b 1
+)
+
+REM Создание виртуального окружения
+if not exist "venv" (
+    echo 🔧 Создание виртуального окружения...
+    python -m venv venv
+)
+
+REM Активация виртуального окружения
+echo 🔧 Активация виртуального окружения...
+call venv\Scripts\activate.bat
+
+REM Обновление pip
+echo 📦 Обновление pip...
+python -m pip install --upgrade pip
+
+REM Установка зависимостей
+echo 📦 Установка зависимостей...
+pip install -e ".[dev]"
+
+REM Создание директорий
+echo 📁 Создание структуры проекта...
+mkdir data\raw\kk 2>nul
+mkdir data\raw\ru 2>nul
+mkdir data\processed 2>nul
+mkdir data\embeddings 2>nul
+mkdir data\faiss_indexes 2>nul
+mkdir models\pretrained 2>nul
+mkdir models\finetuned 2>nul
+mkdir models\adapters 2>nul
+mkdir logs 2>nul
+mkdir mlruns 2>nul
+mkdir experiments\notebooks 2>nul
+mkdir experiments\scripts 2>nul
+
+REM Копирование конфигурации
+if not exist ".env" (
+    echo 📄 Создание .env файла...
+    copy .env.example .env >nul
+    echo ⚠️  Отредактируйте .env файл перед использованием
+)
+
+REM Установка pre-commit хуков
+echo 🔧 Установка pre-commit хуков...
+pre-commit install
+
+REM Скачивание примеров данных
+echo 📊 Скачивание примеров данных...
+if exist "scripts\download_sample_data.py" (
+    python scripts\download_sample_data.py
+)
+
+echo ✅ Настройка завершена!
+echo.
+echo Следующие шаги:
+echo 1. Отредактируйте .env файл
+echo 2. Запустите: python run.py train
+echo 3. Запустите: python run.py serve
+echo 4. Запустите: python run.py demo
+echo.
+echo Удачи в разработке! 🚀
+
+pause
