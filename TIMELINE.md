@@ -10,3 +10,4 @@
 - commit 9: ablation study
 - commit 10: API
 - commit 11: Docker
+- commit 12: cloud deployment
